@@ -20,17 +20,17 @@ class BalanceCalculator {
      */
     fun calculate(accountId: String, start: Instant, end: Instant, transactions: List<Transaction>): Result {
 
-        // only care about transactions to and from this account
+        // filter transactions to and from this account
         val accountTransactions = transactions.filter {
             accountId == it.fromAccountId || accountId == it.toAccountId
         }
 
-        // get reversed transaction ids across entire import file
+        // map reversed transaction ids
         val reversals = accountTransactions
             .filter { it.transactionType == REVERSAL }
             .map { it.relatedTransaction }
 
-        // filter out these transactions and the actual reversal transaction and sum between provided dates
+        // filter reversed and reversal transactions between the start and end date
         val requiredTransactions = accountTransactions
             .filter {
                 start.isBefore(it.createdAt)
@@ -39,10 +39,12 @@ class BalanceCalculator {
                         && it.transactionType != REVERSAL
             }
 
+        // no transactions were found, return zero
         if (requiredTransactions.isEmpty()) {
             return Result(BigDecimal.ZERO, 0)
         }
 
+        // sum the remaining transactions
         val total = requiredTransactions.map { it.getRelativeAmount(accountId) }
             .reduce { acc, curr ->
                 acc + curr
