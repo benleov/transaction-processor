@@ -15,7 +15,7 @@ To run the application:
 ```
 
 Where ACC334455 is the account id, example/input.csv is the transaction file, and the remaining fields are
-the start date and end date respectively.
+the start date and end date respectively. Please be aware that date format is `dd/MM/yyyy'T'HH:mm:ss`, and each field is separated by a comma.
 
 ### Assumptions
 
